@@ -6,6 +6,7 @@ ToIoTwithLoRaWAN::ToIoTwithLoRaWAN()
 
 void ToIoTwithLoRaWAN::setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer, unsigned int qos)
 {
+    //Serial.begin(9600);
     Serial.begin(115200);
     if(!lora.init()){
         Serial.println("RFM95 not detected");
@@ -27,6 +28,30 @@ void ToIoTwithLoRaWAN::actuator_servo(struct Actuator* actptr, Servo* servoptr, 
             actptr->previousMillis = millis();
             servoptr->attach(pin);
             servoptr->write(actptr->value[actptr->running_index]);
+            
+            actptr->running_index++;
+            if (actptr->running_index >= actptr->values_len)
+            {
+                actptr->run = false;
+            }
+        }
+    }
+}
+
+void ToIoTwithLoRaWAN::actuator_L9110(struct Actuator* actptr, int pin1, int pin2)
+{
+    if((actptr->run == true) && (actptr->running_index < actptr->values_len)) {
+        if(millis() - actptr->previousMillis > actptr->interval[actptr->running_index]) {
+            Serial.println("IF TEST");
+            actptr->previousMillis = millis();
+            if (actptr->value[actptr->running_index] == 1){
+                digitalWrite(pin1, HIGH);
+                digitalWrite(pin2, LOW);
+            }
+            else{
+                digitalWrite(pin1, LOW);
+                digitalWrite(pin2, LOW);
+            }
             
             actptr->running_index++;
             if (actptr->running_index >= actptr->values_len)
@@ -88,7 +113,6 @@ void ToIoTwithLoRaWAN::pub(char* sensorId, int cnt, ...)
             Serial.println(msg);
             uplink_counter++;
         }
-        
     }
     
     lora.update();

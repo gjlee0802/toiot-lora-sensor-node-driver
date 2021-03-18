@@ -154,7 +154,7 @@ bool LoRaWANClass::init(void)
 bool LoRaWANClass::join(void)
 {    
     bool join_status;
-    const unsigned long timeout = 6000;
+    const unsigned long timeout = 2000;
     unsigned long prev_millis;    
 
     if (currentChannel == MULTI) {
@@ -166,9 +166,10 @@ bool LoRaWANClass::join(void)
     prev_millis = millis();
     do {
         join_status = LORA_join_Accept(&Buffer_Rx, &Session_Data, &OTAA_Data, &Message_Rx, &LoRa_Settings);
-        Serial.println(join_status);
+        
     }while ((millis() - prev_millis) < timeout && !join_status);
 
+    Serial.println(join_status);
     return join_status;
 }
 
@@ -475,6 +476,7 @@ int LoRaWANClass::handle_mac_cmd_req(char outstr[], unsigned int *uplink_counter
     switch (outstr[0]) // [0]: CID
     {
     case DevStatusReq:
+        Serial.println("RECEIVED DevStatusReq");
         char data[5];
         data[0] = DevStatusAns;
         data[1] = 255;
@@ -487,6 +489,8 @@ int LoRaWANClass::handle_mac_cmd_req(char outstr[], unsigned int *uplink_counter
         //lora.update();
         break;
     case ActuatorReq:
+        Serial.println("RECEIVED ActuatorReq");
+        Serial.println(strlen(outstr));
         for(int i=1; i < strlen(outstr)/2; i++)
         {
             value = outstr[i*2];

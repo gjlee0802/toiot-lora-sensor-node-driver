@@ -13,6 +13,7 @@ class ToIoTwithLoRaWAN
         void setupToIoTwithLoRaWAN(char* nodeI, const unsigned long intertimer, unsigned int QOS);
         void pub(char* sensorId, int cnt, ...);
         void actuator_servo(struct Actuator* actptr, Servo* servoptr, int pin);
+        void actuator_L9110(struct Actuator* actptr, int pin1, int pin2);
         void set_target_actuator(struct Actuator *actptr);
     private:
         char topic[26];
