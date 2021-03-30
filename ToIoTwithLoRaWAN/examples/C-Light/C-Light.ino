@@ -12,24 +12,27 @@ const sRFM_pins RFM_pins = {
 
 ToIoTwithLoRaWAN t;
 double value = 0.0; 
-// Actuator 1
-struct Actuator a1;
+// Actuator 2
+struct Actuator a2;
 Servo myservo;
 // PIR
 int pirPin = D1; //D1    // 센서 신호핀
 int pirState = LOW;   // 센서 초기상태는 움직임이 없음을 가정
 int pirVal = 0;          // 센서 신호의 판별을 위한 변수
+double pirCnt = 0;   
 
 //cds
-int cdsPin = A0;
-int cdsVal = 0;
-
+int cdsPin1 = A0;
+int cdsPin2 = A1;
+double cdsVal1 = 0;
+double cdsVal2 = 0;
 // LED
 int ledPin = D3;
 
 void setup() {
   pinMode(pirPin, INPUT);
-  pinMode(cdsPin, INPUT);
+  pinMode(cdsPin1, INPUT);
+  pinMode(cdsPin2, INPUT);
   pinMode(ledPin, OUTPUT);
   
   t.setupToIoTwithLoRaWAN(nodeId, interval, 0);
@@ -49,7 +52,7 @@ void setup() {
   lora.setAppKey(appKey);
 
   // Actuator setting
-  a1.actuatorId = 1;
+  a2.actuatorId = 2;  // LED actuator
 
   // Join procedure
   bool isJoined;
@@ -64,17 +67,16 @@ void setup() {
 }
 
 void loop() {
-  cdsVal = analogRead(cdsPin);
-  Serial.print("CDS: ");
-  Serial.println(cdsVal);
-  
-  analogWrite(ledPin, 254);
+  cdsVal1 = analogRead(cdsPin1);
+  cdsVal2 = analogRead(cdsPin2);
+
   pirVal = digitalRead(pirPin);
 
   if (pirVal == HIGH) {
     if (pirState == LOW){
            Serial.println("Welcome!");    // 시리얼 모니터 출력
-            pirState = HIGH;
+           pirCnt=pirCnt+1.0;
+           pirState = HIGH;
     }
   } 
   else {           
@@ -83,7 +85,11 @@ void loop() {
           pirState = LOW;
     }
   }
-  
-  t.pub("sensor-uuid-1", 1, value);
+  t.pub("5,6,9\0", 3, cdsVal1, pirCnt, cdsVal2); 
+  t.rcv();
+
+  t.set_target_actuator(&a2);
+  t.actuator_LED(&a2, ledPin);
+
   wdt_reset();
 }

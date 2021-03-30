@@ -33,5 +33,6 @@ void setup() {
 
 void loop() {
   t.pub("sensor-uuid-1", 1,value);
+  t.rcv();
   wdt_reset();
 }

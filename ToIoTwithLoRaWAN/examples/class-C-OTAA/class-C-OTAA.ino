@@ -2,19 +2,16 @@
 #include "config.h"
 
 const sRFM_pins RFM_pins = {
-  .CS = 15,
-  .RST = 16,
-  .DIO0 = 4,
-  .DIO1 = 5,
+  .CS = 10,
+  .RST = 9,
+  .DIO0 = 2,
+  .DIO1 = 3,
   .DIO2 = -1,
   .DIO5 = -1,
 };
 
 ToIoTwithLoRaWAN t;
 double value = 0.0; 
-// Actuator 1
-struct Actuator a1;
-Servo myservo;
 
 void setup() {
   t.setupToIoTwithLoRaWAN(nodeId, interval, 0);
@@ -33,11 +30,6 @@ void setup() {
   lora.setAppEUI(appEui);
   lora.setAppKey(appKey);
 
-  // Actuator setting
-  a1.actuatorId = 1;
-  myservo.attach(2);
-  myservo.write(0);
-
   // Join procedure
   bool isJoined;
   do {
@@ -52,7 +44,6 @@ void setup() {
 
 void loop() {
   t.pub("sensor-uuid-1", 1, value);
-  t.set_target_actuator(&a1);
-  t.actuator_servo(&a1, &myservo, 2);
+  t.rcv();
   wdt_reset();
 }

@@ -1,4 +1,4 @@
-char* nodeId = "node-uuid";
+char* nodeId = "101";
 //ABP Credentials 
 const char *devEui = "2601115F";
 char appEui[] = "00000000000000000000000000000000";
